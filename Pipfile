@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 requests = "*"
 luigi = "*"
+psycopg2 = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.7"
