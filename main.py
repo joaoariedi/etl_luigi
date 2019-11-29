@@ -7,7 +7,6 @@ import json
 import datetime
 import luigi.contrib.postgres
 import pandas as pd
-import csv
 
 
 # Configuration classes
@@ -73,12 +72,11 @@ class ExtractNameId(luigi.Task):
         return users_ids
 
     def run(self):
-        with self.output().open("w") as outfile:
-            df = pd.DataFrame(self.get_name_id())
-            df.to_csv(outfile, encoding='utf-8', index=False, header=False)
+        df = pd.DataFrame(self.get_name_id())
+        df.to_parquet(self.output().path, index=False)
 
     def output(self):
-        path = f"data/users_{str(self.date)}_ids.csv"
+        path = f"data/users_{str(self.date)}_ids.parquet"
         return luigi.LocalTarget(path)
 
 
@@ -96,10 +94,9 @@ class WriteUserCodsToSQL(luigi.contrib.postgres.CopyToTable):
     ]
 
     def rows(self):
-        with self.input()[0].open('r') as input_file:
-            reader = csv.reader(input_file)
-            rows = [row for row in reader if len(row) == len(self.columns)]
-            return rows
+        df = pd.read_parquet(self.input()[0].path)
+        rows = df.values.tolist()
+        return rows
 
     def requires(self):
         return [ExtractNameId(self.date)]
