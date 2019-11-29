@@ -5,6 +5,8 @@ import luigi
 import requests
 import json
 import datetime
+import luigi.contrib.postgres
+import pandas as pd
 
 
 # Configuration classes
@@ -13,9 +15,16 @@ class OmieAPI(luigi.Config):
     secret = luigi.Parameter()
 
 
+class PostgresTable(luigi.Config):
+    host = luigi.Parameter()
+    password = luigi.Parameter()
+    database = luigi.Parameter()
+    user = luigi.Parameter()
+
+
 # Tasks
 class GetUserFromOmie(luigi.Task):
-    date = luigi.DateSecondParameter(default=datetime.datetime.now())
+    date = luigi.DateSecondParameter()
 
     def run(self):
         key = OmieAPI().key
@@ -48,28 +57,57 @@ class GetUserFromOmie(luigi.Task):
 
 
 class ExtractNameId(luigi.Task):
-    date = luigi.DateSecondParameter(default=datetime.datetime.now())
+    date = luigi.DateSecondParameter()
 
     def requires(self):
-        return [GetUserFromOmie()]
+        return [GetUserFromOmie(self.date)]
 
     def get_name_id(self):
         with self.input()[0].open('r') as json_file:
             users = json.load(json_file)
         users_ids = []
         for cadastro in users['cadastros']:
-            users_ids.append({'user_id': cadastro['nCodigo'],
-                              'user_name': cadastro['cNome']})
+            users_ids.append({'code': cadastro['nCodigo'],
+                              'name': cadastro['cNome']})
         return users_ids
 
     def run(self):
-        with self.output().open("w") as outfile:
-            json.dump(self.get_name_id(), outfile, indent=4, ensure_ascii=False)
+        df = pd.DataFrame(self.get_name_id())
+        df.to_parquet(self.output().path, index=False)
 
     def output(self):
-        path = f"data/users_{str(self.date)}_ids.json"
+        path = f"data/users_{str(self.date)}_ids.parquet"
         return luigi.LocalTarget(path)
 
 
+class WriteUserCodsToSQL(luigi.contrib.postgres.CopyToTable):
+    date = luigi.Parameter()
+    host = PostgresTable().host
+    password = PostgresTable().password
+    database = PostgresTable().database
+    user = PostgresTable().user
+    table = 'sellers'
+
+    columns = [
+        ('code', 'bigint'),
+        ('name', 'text'),
+    ]
+
+    def rows(self):
+        df = pd.read_parquet(self.input()[0].path)
+        rows = df.values.tolist()
+        return rows
+
+    def requires(self):
+        return [ExtractNameId(self.date)]
+
+
+class BuildTasks(luigi.Task):
+    date = luigi.Parameter(default=datetime.datetime.now())
+
+    def requires(self):
+        return [WriteUserCodsToSQL(self.date)]
+
+
 if __name__ == '__main__':
-    luigi.build([ExtractNameId()])
+    luigi.build([BuildTasks()])

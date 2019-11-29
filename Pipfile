@@ -8,6 +8,9 @@ verify_ssl = true
 [packages]
 requests = "*"
 luigi = "*"
+psycopg2 = "*"
+pandas = "*"
+pyarrow = "*"
 
 [requires]
 python_version = "3.7"
