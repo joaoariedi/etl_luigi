@@ -7,7 +7,7 @@ from load import WriteUserCodsToSQL
 
 
 class BuildTasks(luigi.Task):
-    date = luigi.Parameter(default=datetime.datetime.now())
+    date = luigi.DateSecondParameter(default=datetime.datetime.now())
 
     def requires(self):
         return [WriteUserCodsToSQL(self.date)]
