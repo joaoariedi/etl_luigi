@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/ariedi/projects/py/studies/luigi/scf_luigi/.venv/bin/luigid", line 8, in <module>
+    sys.exit(luigid())
+  File "/home/ariedi/projects/py/studies/luigi/scf_luigi/.venv/lib/python3.7/site-packages/luigi/cmdline.py", line 35, in luigid
+    logdir=opts.logdir, unix_socket=opts.unix_socket)
+  File "/home/ariedi/projects/py/studies/luigi/scf_luigi/.venv/lib/python3.7/site-packages/luigi/process.py", line 127, in daemonize
+    cmd(api_port=api_port, address=address, unix_socket=unix_socket)
+  File "/home/ariedi/projects/py/studies/luigi/scf_luigi/.venv/lib/python3.7/site-packages/luigi/server.py", line 341, in run
+    unix_socket=unix_socket,
+  File "/home/ariedi/projects/py/studies/luigi/scf_luigi/.venv/lib/python3.7/site-packages/luigi/server.py", line 319, in _init_api
+    api_sockets = tornado.netutil.bind_sockets(api_port, address=address)
+  File "/home/ariedi/projects/py/studies/luigi/scf_luigi/.venv/lib/python3.7/site-packages/tornado/netutil.py", line 168, in bind_sockets
+    sock.bind(sockaddr)
+OSError: [Errno 98] Address already in use

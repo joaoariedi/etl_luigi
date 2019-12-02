@@ -3,14 +3,14 @@
 
 import luigi
 import datetime
-from load import WriteUserCodsToSQL
+from load import WriteSellersCodsToSQL, WriteOrdersCodsToSQL
 
 
 class BuildTasks(luigi.Task):
     date = luigi.DateSecondParameter(default=datetime.datetime.now())
 
     def requires(self):
-        return [WriteUserCodsToSQL(self.date)]
+        return [WriteSellersCodsToSQL(self.date), WriteOrdersCodsToSQL(self.date)]
 
 
 if __name__ == '__main__':
