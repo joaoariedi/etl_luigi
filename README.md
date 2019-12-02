@@ -1,8 +1,8 @@
 # LUIGI and PostgreSQL ETL tests
-Get data from a API, process and send to a postgres table
+Get data from an API using requests, process and send to a postgres table, all tasks scheduled using crontab.
 
 ## configurations
-File to place all the external params
+File to place all the configuration params
 ## extract
 Get data from API and store as a json file
 ## transform
