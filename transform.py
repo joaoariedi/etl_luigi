@@ -16,7 +16,8 @@ class ExtractNameId(luigi.Task):
         users_ids = []
         for cadastro in users['cadastros']:
             users_ids.append({'code': cadastro['nCodigo'],
-                              'name': cadastro['cNome']})
+                              'name': cadastro['cNome'],
+                              'ts': self.date})
         return users_ids
 
     def run(self):

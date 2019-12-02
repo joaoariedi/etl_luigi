@@ -6,7 +6,7 @@ import luigi.contrib.postgres
 
 
 class WriteUserCodsToSQL(luigi.contrib.postgres.CopyToTable):
-    date = luigi.Parameter()
+    date = luigi.DateSecondParameter()
     host = PostgresTable().host
     password = PostgresTable().password
     database = PostgresTable().database
@@ -16,6 +16,7 @@ class WriteUserCodsToSQL(luigi.contrib.postgres.CopyToTable):
     columns = [
         ('code', 'bigint'),
         ('name', 'text'),
+        ('ts', 'timestamp'),
     ]
 
     def rows(self):
