@@ -1,6 +1,8 @@
 # LUIGI and PostgreSQL ETL tests
 Get data from an API using requests, process and send to a postgres table, all tasks scheduled using crontab.
 
+![GitHub Logo](images/scheduler.png)
+
 ## configurations
 File to place all the configuration params
 ## extract
